@@ -7,8 +7,8 @@ export default function Home() {
   const [apiStatus, setApiStatus] = useState<string>("检查中...");
 
   useEffect(() => {
-    console.log("ENV:", process.env.NEXT_PUBLIC_API_URL);
-    console.log("BASE:", apiClient.defaults.baseURL);
+    // console.log("ENV:", process.env.NEXT_PUBLIC_API_URL);
+    // console.log("BASE:", apiClient.defaults.baseURL);
     apiClient
       .get("/health")
       .then((res) => setApiStatus(`后端连接成功: ${res.data.status}`))
