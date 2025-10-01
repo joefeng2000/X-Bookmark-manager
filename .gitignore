@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+*.egg-info/
+dist/
+build/
+
+# Node
+node_modules/
+.next/
+out/
+.npm
+.eslintcache
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Docker
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Database
+*.db
+*.sqlite
+
+# 我自己的文件
+Windows 11开发环境搭建说明书.pdf
+Windows11上搭建VSCode的开发环境.md
+安装信息.txt
+常用命令.txt
+技术栈实施计划_(Hugging_Face_方案).pdf
+需求规格说明书_(SRS).pdf
