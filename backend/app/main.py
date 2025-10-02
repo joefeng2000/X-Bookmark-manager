@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import os
+from app.api import bookmarks
 
 app = FastAPI(
     title="X Bookmark Manager API",
@@ -28,6 +29,9 @@ async def root():
 async def health_check():
     return {"status": "healthy"}
 
+
+# 注册路由
+app.include_router(bookmarks.router)
 
 # 后续会挂载前端静态文件
 # if os.path.exists("../frontend/out"):
