@@ -1,54 +1,115 @@
 # app/services/twitter_service.py
 import tweepy
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Tuple
 from app.core.config import settings
 import asyncio
+import secrets
+import hashlib
+import base64
 
 
 class TwitterService:
     def __init__(self):
-        # OAuth 2.0 PKCE认证需要在初始化时设置
-        self.oauth2_user_handler = tweepy.OAuth2UserHandler(
-            client_id=settings.x_client_id,
-            redirect_uri=settings.x_redirect_uri,
-            scope=["tweet.read", "users.read", "bookmark.read", "bookmark.write"],
-            client_secret=settings.x_client_secret,  # 如果是Confidential Client则需要
-        )
-
-        # 如果已经有access_token，直接使用
         self.client = None
-        if (
-            hasattr(settings, "x_oauth2_access_token")
-            and settings.x_oauth2_access_token
-        ):
-            self.client = tweepy.Client(
-                bearer_token=settings.x_oauth2_access_token, wait_on_rate_limit=True
-            )
+        self.current_access_token = None
 
-    def get_authorization_url(self) -> tuple[str, str, str]:
+    def _generate_code_verifier(self) -> str:
+        """生成code_verifier"""
+        code_verifier = base64.urlsafe_b64encode(secrets.token_bytes(32)).decode(
+            "utf-8"
+        )
+        return code_verifier.replace("=", "")
+
+    def _generate_code_challenge(self, verifier: str) -> str:
+        """从code_verifier生成code_challenge"""
+        digest = hashlib.sha256(verifier.encode("utf-8")).digest()
+        challenge = base64.urlsafe_b64encode(digest).decode("utf-8")
+        return challenge.replace("=", "")
+
+    def get_authorization_url(self) -> Tuple[str, str, str]:
         """
         获取OAuth 2.0授权URL
         返回: (授权URL, state, code_verifier)
         """
-        auth_url = self.oauth2_user_handler.get_authorization_url()
-        return (
-            auth_url,
-            self.oauth2_user_handler.state,
-            self.oauth2_user_handler.code_verifier,
+        # 生成code_verifier和state
+        code_verifier = self._generate_code_verifier()
+        state = secrets.token_urlsafe(32)
+
+        # 创建OAuth2UserHandler
+        oauth2_handler = tweepy.OAuth2UserHandler(
+            client_id=settings.x_client_id,
+            redirect_uri=settings.x_redirect_uri,
+            scope=[
+                "tweet.read",
+                "users.read",
+                "bookmark.read",
+                "bookmark.write",
+                "offline.access",
+            ],
+            client_secret=(
+                settings.x_client_secret
+                if hasattr(settings, "x_client_secret") and settings.x_client_secret
+                else None
+            ),
         )
 
-    def fetch_token(self, authorization_response_url: str) -> str:
+        # 手动设置内部属性（这是workaround）
+        oauth2_handler._client.code_verifier = code_verifier
+        oauth2_handler.state = state
+
+        # 获取授权URL
+        auth_url = oauth2_handler.get_authorization_url()
+
+        return auth_url, state, code_verifier
+
+    def fetch_token(
+        self, authorization_response_url: str, code_verifier: str, state: str
+    ) -> Dict:
         """
         使用授权回调URL获取访问令牌
-        参数: authorization_response_url - 用户授权后的完整回调URL
-        返回: access_token
+        参数:
+            authorization_response_url - 用户授权后的完整回调URL
+            code_verifier - 之前生成的code_verifier
+            state - 之前生成的state
+        返回: token字典，包含access_token和refresh_token
         """
-        access_token = self.oauth2_user_handler.fetch_token(authorization_response_url)
+        # 创建新的OAuth2UserHandler
+        oauth2_handler = tweepy.OAuth2UserHandler(
+            client_id=settings.x_client_id,
+            redirect_uri=settings.x_redirect_uri,
+            scope=[
+                "tweet.read",
+                "users.read",
+                "bookmark.read",
+                "bookmark.write",
+                "offline.access",
+            ],
+            client_secret=(
+                settings.x_client_secret
+                if hasattr(settings, "x_client_secret") and settings.x_client_secret
+                else None
+            ),
+        )
 
-        # 使用获取的token初始化client
+        # 恢复code_verifier和state
+        oauth2_handler._client.code_verifier = code_verifier
+        oauth2_handler.state = state
+
+        # 获取访问令牌
+        token_dict = oauth2_handler.fetch_token(authorization_response_url)
+
+        # 初始化client
+        self.current_access_token = token_dict["access_token"]
+        self.client = tweepy.Client(
+            bearer_token=token_dict["access_token"], wait_on_rate_limit=True
+        )
+
+        return token_dict
+
+    def set_access_token(self, access_token: str):
+        """直接设置访问令牌"""
+        self.current_access_token = access_token
         self.client = tweepy.Client(bearer_token=access_token, wait_on_rate_limit=True)
-
-        return access_token
 
     async def fetch_bookmarks_batch(
         self, max_results: int = 100, pagination_token: Optional[str] = None
