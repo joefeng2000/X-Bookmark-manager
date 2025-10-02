@@ -42,9 +42,7 @@ Thumbs.db
 *.sqlite
 
 # 我自己的文件
-Windows 11开发环境搭建说明书.pdf
-Windows11上搭建VSCode的开发环境.md
+Windows 11开发环境搭建说明书.md
 安装信息.txt
 常用命令.txt
-技术栈实施计划_(Hugging_Face_方案).pdf
-需求规格说明书_(SRS).pdf
+需求规格说明书(SRS).md
