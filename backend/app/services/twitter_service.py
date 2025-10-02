@@ -113,16 +113,11 @@ class TwitterService:
                 "utf-8"
             )
             headers["Authorization"] = f"Basic {basic_auth_token}"
-            print(
-                f"[TwitterService] Basic Auth Token created (first 20 chars): {basic_auth_token[:20]}..."
-            )
+            print(f"[TwitterService] Basic Auth Token created")
         else:
             print(f"[TwitterService] No client_secret found, using Public Client mode")
 
         print(f"[TwitterService] Calling token endpoint...")
-        print(f"[TwitterService] Token URL: {token_url}")
-        print(f"[TwitterService] Data keys: {list(data.keys())}")
-        print(f"[TwitterService] Headers: {list(headers.keys())}")
 
         try:
             response = requests.post(token_url, data=data, headers=headers)
@@ -135,12 +130,11 @@ class TwitterService:
 
             token_dict = response.json()
             print(f"[TwitterService] Token received successfully")
-            print(f"[TwitterService] Token keys: {list(token_dict.keys())}")
 
             # 初始化client
             self.current_access_token = token_dict["access_token"]
             self.client = tweepy.Client(
-                bearer_token=token_dict["access_token"], wait_on_rate_limit=True
+                bearer_token=token_dict["access_token"], wait_on_rate_limit=False
             )
 
             return token_dict
@@ -154,12 +148,16 @@ class TwitterService:
         """直接设置访问令牌"""
         print(f"[TwitterService] Setting access token: {access_token[:20]}...")
         self.current_access_token = access_token
-        self.client = tweepy.Client(bearer_token=access_token, wait_on_rate_limit=True)
+        self.client = tweepy.Client(bearer_token=access_token, wait_on_rate_limit=False)
+
+    # app/services/twitter_service.py - 修改 fetch_bookmarks_batch
 
     async def fetch_bookmarks_batch(
         self, max_results: int = 100, pagination_token: Optional[str] = None
-    ) -> Dict:
+    ) -> Optional[Dict]:
         """获取一批书签(最多100条)"""
+        print(f"[TwitterService] fetch_bookmarks_batch called")
+
         if not self.client:
             raise Exception("Client not initialized. Please authenticate first.")
 
@@ -172,14 +170,31 @@ class TwitterService:
                 user_fields=["name", "username", "profile_image_url"],
                 media_fields=["url", "preview_image_url"],
             )
+
+            print(
+                f"[TwitterService] Response received, data count: {len(response.data) if response.data else 0}"
+            )
+
             return {
                 "data": response.data,
                 "includes": response.includes,
                 "meta": response.meta,
             }
         except Exception as e:
-            print(f"Error fetching bookmarks: {e}")
-            return None
+            error_msg = str(e)
+            print(f"[TwitterService] ERROR: {error_msg}")
+
+        # 检查是否是速率限制错误
+        if (
+            "429" in error_msg
+            or "Too Many Requests" in error_msg
+            or "rate limit" in error_msg.lower()
+        ):
+            print(f"[TwitterService] Rate limit hit!")
+            # 返回特殊标记，让调用方知道遇到了速率限制
+            return {"rate_limited": True, "wait_seconds": 900}
+
+        return None
 
     async def delete_bookmark(self, tweet_id: str) -> bool:
         """删除单个书签,遵守速率限制"""
@@ -188,11 +203,27 @@ class TwitterService:
 
         try:
             self.client.remove_bookmark(tweet_id)
-            await asyncio.sleep(20)
+            await asyncio.sleep(20)  # 每20秒删除一个
             return True
         except Exception as e:
             print(f"Error deleting bookmark {tweet_id}: {e}")
             return False
+
+    async def get_current_user(self) -> Optional[Dict]:
+        """获取当前认证用户的信息"""
+        if not self.client:
+            raise Exception("Client not initialized")
+
+        try:
+            user = self.client.get_me(user_fields=["id", "username", "name"])
+            return {
+                "id": user.data.id,
+                "username": user.data.username,
+                "name": user.data.name,
+            }
+        except Exception as e:
+            print(f"[TwitterService] Error getting current user: {e}")
+            return None
 
 
 # 创建单例实例
