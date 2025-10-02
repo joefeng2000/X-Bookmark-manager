@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from app.api import bookmarks, auth
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import os
@@ -9,6 +10,9 @@ app = FastAPI(
     description="API for managing X.com bookmarks",
     version="1.0.0",
 )
+
+app.include_router(bookmarks.router)
+app.include_router(auth.router)
 
 # CORS配置
 app.add_middleware(
