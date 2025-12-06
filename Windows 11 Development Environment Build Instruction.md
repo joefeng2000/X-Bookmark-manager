@@ -8,7 +8,7 @@
 
 - Windows 11 operating system
 - Administrator privileges
-- At least 16GB RAM (16GB recommended)
+- At least 16GB RAM (32GB recommended)
 - At least 40GB of free disk space
 - Stable Internet connection
 
