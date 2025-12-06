@@ -2,8 +2,8 @@
 
 ## Complete guide to building a development environment
 
- This guide will help build a complete X.com bookmarklet management tool development environment from scratch on Windows 11 with a technology stack that includes Next.js + Tailwind CSS (front-end), Python + FastAPI (back-end), Supabase (database), and Docker (containerization). [^2](https://www.notion.so/Ji-Zhu-Zhan-Shi-Shi-Ji-Hua-_-Hugging_Face_Fang-An.pdf)
-
+ This guide will help build a complete X.com bookmarklet management tool development environment from scratch on Windows 11 with a technology stack that includes Next.js + Tailwind CSS (front-end), Python + FastAPI (back-end), Supabase (database), and Docker (containerization).
+ 
 ### System Requirements
 
 - Windows 11 operating system
@@ -49,7 +49,7 @@ wsl --list --verbose
  Visit the Git official website to download the installer:
 
 ```bash
-# 下载地址
+# Download address
 <https://git-scm.com/download/win>
 
 ```
@@ -73,8 +73,8 @@ git --version
  Configure Git user information:
 
 ```bash
-git config --global user.name "Tao Feng"
-git config --global user.email "******gmail.com"
+git config --global user.name "<Your Name>"
+git config --global user.email "<Your email address>"
 
 ```
 
@@ -83,7 +83,7 @@ git config --global user.email "******gmail.com"
  Visit the Node.js website to download the LTS version:
 
 ```bash
-# 下载地址
+# Download address
 <https://nodejs.org/>
 
 ```
@@ -108,7 +108,7 @@ npm -v
  Visit the official Python website to download the installer:
 
 ```bash
-# 下载地址
+# Download address
 <https://www.python.org/downloads/>
 
 ```
@@ -133,7 +133,7 @@ pip --version
  Visit the VSCode website to download the installer:
 
 ```bash
-# 下载地址
+# Download address
 <https://code.visualstudio.com/>
 
 ```
@@ -162,7 +162,7 @@ code --version
  Visit the official Docker website to download the installer:
 
 ```bash
-# 下载地址
+# Download address
 <https://www.docker.com/products/docker-desktop/>
 
 ```
@@ -291,14 +291,14 @@ I've modified the following file slightly
 ### 3.1 Creating the Project Root Directory
 
 ```bash
-# 打开命令提示符或PowerShell
+# Open Command Prompt or PowerShell
 mkdir C:\\Projects\\x-bookmark-manager
 cd C:\\Projects\\x-bookmark-manager
 
-# 初始化Git仓库
+# Initialize Git repository
 git init
 
-# 创建.gitignore文件
+# Create .gitignore file
 New-Item -Path .gitignore -ItemType File
 
 ```
@@ -364,16 +364,16 @@ cd backend
 ### 4.2 Create a Python Virtual Environment
 
 ```bash
-# 创建虚拟环境
+# Create a virtual environment
 python -m venv venv
 
-# 激活虚拟环境（Windows PowerShell）
+# Activate the virtual environment（Windows PowerShell）
 .\\venv\\Scripts\\Activate.ps1
 
-# 如果遇到执行策略错误，运行：
+# If you encounter an execution policy error, run:
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
-# 或使用命令提示符（CMD）激活：
+# Or use the Command Prompt (CMD) to activate：
 .\\venv\\Scripts\\activate.bat
 
 ```
@@ -381,7 +381,7 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
  Verify the virtual environment:
 
 ```bash
-Get-Command python  # 应显示venv目录中的python路径，比如“D:\x-bookmark-manager\backend\venv\Scripts\python.exe”，如果不是，Command + Shift + P，在命令面板中输入 Python: Select Interpreter，VSCode 会列出它能找到的所有 Python 解释器。请选择带有 .venv 路径的那一项。它通常会被标记为 Recommended (推荐)
+Get-Command python  # The Python path in the venv directory should be displayed, such as "C:\<Your Project>\backend\venv\Scripts\python.exe". If it is not, press Command + Shift + P, enter "Python: Select Interpreter" in the command palette, and VSCode will list all the Python interpreters it can find. Please select the one with the .venv path. It is usually marked as Recommended.
 
 ```
 
@@ -420,7 +420,7 @@ pip list
 ### 4.4 Creating the back-end base file structure
 
 ```bash
-# 在backend目录中创建以下结构
+# Create the following structure in the backend directory
 mkdir app
 mkdir app\\api
 mkdir app\\core
@@ -428,7 +428,7 @@ mkdir app\\models
 mkdir app\\services
 mkdir app\\schemas
 
-# 创建初始化文件
+# Create initialization file
 New-Item -Path app\\__init__.py -ItemType File
 New-Item -Path app\\api\\__init__.py -ItemType File
 New-Item -Path app\\core\\__init__.py -ItemType File
@@ -454,7 +454,7 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# CORS配置
+# CORS Configuration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
@@ -471,7 +471,7 @@ async def root():
 async def health_check():
     return {"status": "healthy"}
 
-# 后续会挂载前端静态文件
+# Static frontend files will be mounted later
 # if os.path.exists("../frontend/out"):
 #     app.mount("/", StaticFiles(directory="../frontend/out", html=True), name="static")
 
@@ -480,17 +480,17 @@ async def health_check():
  Creating the `.env` file:
 
 ```bash
-# FastAPI配置
+# FastAPI Configuration
 APP_NAME=X-Bookmark-Manager
 DEBUG=True
 HOST=0.0.0.0
 PORT=8000
 
-# Supabase配置
+# Supabase Configuration
 SUPABASE_URL=your_supabase_url_here
 SUPABASE_KEY=your_supabase_anon_key_here
 
-# X API配置
+# X API Configuration
 X_API_KEY=your_x_api_key_here
 X_API_SECRET=your_x_api_secret_here
 X_ACCESS_TOKEN=your_x_access_token_here
@@ -531,7 +531,7 @@ settings = Settings()
 ### 4.6 Testing the backend run
 
 ```bash
-# 确保在backend目录且虚拟环境已激活
+# Ensure you are in the backend directory and the virtual environment is activated
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 ```
@@ -547,10 +547,10 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ### 5.1 Return to project root and create Next.js application
 
 ```bash
-# 返回项目根目录
+# Return to the project root directory
 cd ..
 
-# 创建Next.js应用（使用TypeScript和App Router）
+# Create a Next.js application (using TypeScript and App Router)
 npx create-next-app@latest frontend --typescript --tailwind --eslint --app --src-dir --import-alias "@/*"
 
 ```
@@ -603,7 +603,7 @@ export default config;
  Verify that `src/app/globals.css` contains the Tailwind directive:
 
 ```css
-@import "tailwindcss"; //v4版本中，若需要完整的Tailwind（含主题层、预设重置 Preflight、工具类），只保留这一行就够了
+@import "tailwindcss"; //In v4, if you need the complete Tailwind (including theme layer, preset reset Preflight, utility classes), keeping just this line is sufficient
 
 :root {
   --background: #ffffff;
@@ -663,12 +663,12 @@ import { useEffect, useState } from 'react';
 import apiClient from '@/lib/api';
 
 export default function Home() {
-  const [apiStatus, setApiStatus] = useState<string>('检查中...');
+  const [apiStatus, setApiStatus] = useState<string>('Checking...');
 
   useEffect(() => {
     apiClient.get('/health')
-      .then(res => setApiStatus(`后端连接成功: ${res.data.status}`))
-      .catch(() => setApiStatus('后端连接失败'));
+      .then(res => setApiStatus(`Backend connection successful: ${res.data.status}`))
+      .catch(() => setApiStatus('Backend connection failed'));
   }, []);
 
   return (
@@ -684,7 +684,7 @@ export default function Home() {
 ### 5.7 Test the front-end operation
 
 ```bash
-# 在frontend目录中运行
+# Run in the frontend directory
 npm run dev
 
 ```
@@ -713,21 +713,20 @@ export default nextConfig;
 
 ```bash
 npm run build
-# 会生成out目录，包含所有静态文件
-
+# An `out` directory will be generated, containing all static files
 ```
 
 ### Step 6: Configure the Supabase database
 
 ### 6.1 Create a Supabase project
 
- Visit `https://supabase.com并注册账号 to` create a new project:
+ Visit `https://supabase.com and register an account to` create a new project:
 
 - Select an organization or create a new one
 - Enter the project name: `x-bookmark-manager`
 - Set the database password (be sure to save it)
 - Select the region (the most recent region is recommended)
-- Click on "Create new project ["^1](https://www.notion.so/Xu-Qiu-Gui-Ge-Shuo-Ming-Shu-_-SRS.pdf)
+- Click on "Create new project"
 
 ### 6.2 Getting Connection Information
 
@@ -742,7 +741,7 @@ npm run build
  Execute it in the SQL editor of the Supabase console:
 
 ```sql
--- 创建书签表
+-- Create bookmark table
 CREATE TABLE bookmarks (
     tweet_id TEXT PRIMARY KEY,
     text TEXT,
@@ -760,7 +759,7 @@ CREATE TABLE bookmarks (
     sync_status TEXT DEFAULT 'synced',
 );
 
--- 创建文件夹表
+-- Create folder table
 CREATE TABLE folders (
     folder_id TEXT PRIMARY KEY,
     folder_name TEXT NOT NULL,
@@ -768,14 +767,14 @@ CREATE TABLE folders (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 创建标签表
+-- Create a bookmark table
 CREATE TABLE tags (
     tag_id TEXT PRIMARY KEY,
     tag_name TEXT UNIQUE NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 创建索引以优化查询性能
+-- Create indexes to optimize query performance
 CREATE INDEX idx_bookmarks_author ON bookmarks(author_id);
 CREATE INDEX idx_bookmarks_created_at ON bookmarks(created_at DESC);
 CREATE INDEX idx_bookmarks_sync_status ON bookmarks(sync_status);
@@ -800,7 +799,7 @@ from supabase import create_client, Client
 from app.core.config import settings
 
 def get_supabase_client() -> Client:
-    """创建Supabase客户端实例"""
+    """Create Supabase client instance"""
     return create_client(settings.supabase_url, settings.supabase_key)
 
 supabase_client = get_supabase_client()
@@ -814,36 +813,36 @@ supabase_client = get_supabase_client()
  Create `the Dockerfile`:
 
 ```docker
-# 使用官方Python 3.11镜像作为基础
+# Using the official Python 3.11 image as the base
 FROM python:3.11-slim
 
-# 设置工作目录
+# Set working directory
 WORKDIR /app
 
-# 安装系统依赖
+# Install system dependencies
 RUN apt-get update && apt-get install -y build-essential libpq-dev && rm -rf /var/lib/apt/lists/*
 
-# 复制后端依赖文件
+# Copy backend dependency files
 COPY backend/requirements.txt ./backend/
 
-# 安装Python依赖
+# Install Python dependencies
 RUN pip install --no-cache-dir --upgrade pip && pip install --no-cache-dir -r backend/requirements.txt
 
-# 复制后端代码
+# Copy backend code
 COPY backend ./backend
 
-# 复制前端构建产物（需要先在本地构建）
+# Copy front-end build artifacts (requires local build first)
 COPY frontend/out ./frontend/out
 
-# 暴露端口
+# Expose port
 EXPOSE 7860
 
-# 设置环境变量
+# Set environment variables
 ENV PYTHONUNBUFFERED=1
 ENV HOST=0.0.0.0
 ENV PORT=7860
 
-# 启动命令
+# Start command
 CMD ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "7860"]
 
 ```
@@ -924,24 +923,24 @@ services:
 ### 7.4 Testing Docker builds locally
 
 ```bash
-# 首先构建前端静态文件
+# First, build the front-end static files
 cd frontend
 npm run build
 cd ..
 
-# 构建Docker镜像，在这之前请确认Docker Desktop已经开启
+# Build the Docker image, please ensure Docker Desktop is running before proceeding
 docker build -t x-bookmark-manager .
 
-# 运行Docker容器
+# Run Docker container
 docker run -d -p 7860:7860 --env-file backend/.env --name x-bookmark-app x-bookmark-manager
 
-# 查看日志
+# View Log
 docker logs -f x-bookmark-app
 
-# 停止容器
+# Stop container
 docker stop x-bookmark-app
 
-# 删除容器
+# Delete container
 docker rm x-bookmark-app
 
 ```
@@ -949,24 +948,24 @@ docker rm x-bookmark-app
  Or use docker-compose:
 
 ```bash
-# 启动服务
+# Start service
 docker-compose up --build
 
-# 后台运行
+# Running in the background
 docker-compose up -d
 
-# 停止服务
+# Stop service
 docker-compose down
 
 ```
 
- Visit `http://localhost:7860测试应用.`[^12^5](https://fastapi.tiangolo.com/deployment/docker/)
+ Visit `http://localhost:7860 Test application.`[^12^5](https://fastapi.tiangolo.com/deployment/docker/)
 
 ### Step 8: Configure X API and Tweepy
 
 ### 8.1 Get X API credentials
 
- Visit `https://developer.x.com并执行:`
+ Visit `https://developer.x.com and execute:`
 
 - Apply for a developer account
 - Create new projects and applications
@@ -990,7 +989,7 @@ from app.core.config import settings
 
 class TwitterService:
     def __init__(self):
-        # OAuth 1.0a认证
+        # OAuth 1.0a Authentication
         self.auth = tweepy.OAuthHandler(
             settings.x_api_key,
             settings.x_api_secret
@@ -1000,7 +999,7 @@ class TwitterService:
             settings.x_access_secret
         )
 
-        # OAuth 2.0 Bearer Token认证
+        # OAuth 2.0 Bearer Token Authentication
         self.client = tweepy.Client(
             bearer_token=settings.x_bearer_token,
             consumer_key=settings.x_api_key,
@@ -1016,7 +1015,7 @@ class TwitterService:
         max_results: int = 100,
         pagination_token: Optional[str] = None
     ) -> Dict:
-        """获取用户书签"""
+        """Get user bookmarks"""
         try:
             response = self.client.get_bookmarks(
                 max_results=max_results,
@@ -1032,7 +1031,7 @@ class TwitterService:
             return None
 
     async def delete_bookmark(self, tweet_id: str) -> bool:
-        """删除书签"""
+        """Delete bookmark"""
         try:
             self.client.remove_bookmark(tweet_id)
             return True
@@ -1040,7 +1039,7 @@ class TwitterService:
             print(f"Error deleting bookmark {tweet_id}: {e}")
             return False
 
-# 创建单例实例
+# Create a singleton instance
 twitter_service = TwitterService()
 
 ```
@@ -1062,7 +1061,7 @@ async def get_all_bookmarks(
     limit: int = 100,
     offset: int = 0
 ):
-    """获取本地存储的所有书签"""
+    """Get all bookmarks stored locally"""
     try:
         response = supabase_client.table("bookmarks") \
             .select("*") \
@@ -1075,13 +1074,13 @@ async def get_all_bookmarks(
 
 @router.post("/sync/start")
 async def start_sync(background_tasks: BackgroundTasks):
-    """启动书签同步任务"""
-    # 这里会在后台任务中执行同步逻辑
+    """Start bookmark synchronization task"""
+    # This will execute the synchronization logic in the background task
     return {"message": "Sync started", "status": "processing"}
 
 @router.get("/sync/status")
 async def get_sync_status():
-    """查询同步任务状态"""
+    """Query synchronization task status"""
     return {"status": "idle", "progress": 0}
 
 ```
@@ -1102,18 +1101,18 @@ app.include_router(bookmarks.router)
  Create `scripts/start-dev.ps1` (PowerShell script):
 
 ```powershell
-# 启动开发环境
+# Starting the development environment
 
 Write-Host "Starting X Bookmark Manager Development Environment..." -ForegroundColor Green
 
-# 启动后端
+# Start backend
 Write-Host "`nStarting Backend..." -ForegroundColor Yellow
 Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd backend; .\\venv\\Scripts\\Activate.ps1; uvicorn app.main:app --reload --host 0.0.0.0 --port 8000"
 
-# 等待2秒
+# Wait 2 seconds
 Start-Sleep -Seconds 2
 
-# 启动前端
+# Start frontend
 Write-Host "`nStarting Frontend..." -ForegroundColor Yellow
 Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd frontend; npm run dev"
 
@@ -1146,17 +1145,17 @@ echo API Docs: <http://localhost:8000/docs>
  Create `scripts/build.ps1`:
 
 ```powershell
-# 构建完整应用
+# Building the complete application
 
 Write-Host "Building X Bookmark Manager..." -ForegroundColor Green
 
-# 构建前端
+# Building the frontend
 Write-Host "`nBuilding Frontend..." -ForegroundColor Yellow
 cd frontend
 npm run build
 cd ..
 
-# 构建Docker镜像
+# Building Docker Image
 Write-Host "`nBuilding Docker Image..." -ForegroundColor Yellow
 docker build -t x-bookmark-manager:latest .
 
@@ -1169,11 +1168,11 @@ Write-Host "`nBuild completed successfully!" -ForegroundColor Green
 ### 10.1 Creating a Git repository structure
 
 ```bash
-# 在项目根目录
+# In the project root directory
 git add .
 git commit -m "Initial commit: Project setup complete"
 
-# 创建开发分支
+# Create development branch
 git branch develop
 git checkout develop
 
@@ -1208,15 +1207,9 @@ pinned: false
 
 # X Bookmark Manager
 
-高性能、私有化的 X.com 书签管理工具
+High-performance, private X.com bookmark management tool
 
 ```
-
-### 11.2 Preparing to Deploy to Hugging Face
-
-- Create a new Docker Space in Hugging Face
-- Push the project to the Space's Git repository.
-- Hugging Face will automatically detect the Dockerfile and build the deployment [^1](https://www.notion.so/Ji-Zhu-Zhan-Shi-Shi-Ji-Hua-_-Hugging_Face_Fang-An.pdf)
 
 ### Step 12: Environment Validation Checklist
 
@@ -1285,12 +1278,12 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
  If port 3000 or 8000 is occupied:
 
 ```bash
-# 查找占用端口的进程
+# Find the process occupying the port
 netstat -ano | findstr :3000
 netstat -ano | findstr :8000
 
-# 结束进程（使用进程ID）
-taskkill /PID <进程ID> /F
+# End process (using process ID)
+taskkill /PID <Process ID> /F
 
 ```
 
@@ -1327,7 +1320,7 @@ npm install
 
 ```bash
 git add .
-git commit -m "描述性提交信息"
+git commit -m "Descriptive commit message"
 git push origin develop
 
 ```
@@ -1335,24 +1328,13 @@ git push origin develop
 ### Build the production version
 
 ```bash
-# 运行构建脚本
+# Run the build script
 .\\scripts\\build.ps1
 
-# 或手动执行
+# or execute manually
 cd frontend
 npm run build
 cd ..
 docker build -t x-bookmark-manager:latest .
-
-```
-
-### Deploy to Hugging Face
-
-```bash
-# 添加Hugging Face远程仓库
-git remote add hf <https://huggingface.co/spaces/yourusername/x-bookmark-manager>
-
-# 推送到Hugging Face
-git push hf main
 
 ```
